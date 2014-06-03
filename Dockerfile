@@ -3,3 +3,5 @@
 # docker will not default to a new version when it comes out.
 FROM ubuntu:14.04
 
+MAINTAINER Steven Burgess steven.a.burgess@hotmail.com
+
