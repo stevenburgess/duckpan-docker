@@ -12,3 +12,8 @@ RUN apt-get install -y curl
 # During the install of the duckpan, we found out we also need
 RUN apt-get install -y libssl-dev
 
+
+# This will be the dividing line, all above steps do not specify a user
+# so they are done by root. Below are things done by the ddg user.
+
+
