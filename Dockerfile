@@ -5,3 +5,10 @@ FROM ubuntu:14.04
 
 MAINTAINER Steven Burgess steven.a.burgess@hotmail.com
 
+RUN apt-get update
+RUN apt-get install -y build-essential
+# Multiple steps need curl installed, so lets get it
+RUN apt-get install -y curl
+# During the install of the duckpan, we found out we also need
+RUN apt-get install -y libssl-dev
+
