@@ -19,24 +19,29 @@ RUN apt-get install -y libssl-dev
 
 # Create the user with a home directory
 RUN useradd -m ddg
+
+# The USER command can be used to change the user that runs all lines after its
+# declaration.
+USER ddg
+
 # Install perlbrew, a tool that creates perl working environments in the users
 # home directories
-RUN su ddg -c 'curl -kL http://install.perlbrew.pl | bash'
+RUN curl -kL http://install.perlbrew.pl | /bin/bash
 # This drops the perlbrew binary into ~/perl5/perlbrew/bin/perlbrew,
 # You can then run the perbew installer to get the correct version of perl.
 # Note that this does take a while!
-RUN su ddg -c '/home/ddg/perl5/perlbrew/bin/perlbrew install perl-5.16.3'
+RUN /home/ddg/perl5/perlbrew/bin/perlbrew install perl-5.16.3
 # Install cpanm with our specific version of perl. This places the cpnam bin
 # at /perl5/perlbrew/perls/perl-5.16.3/bin/cpanm
-RUN su ddg -c 'curl -L http://cpanmin.us | /home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/perl - App::cpanminus'
+RUN curl -L http://cpanmin.us | /home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/perl - App::cpanminus
 
 # This gets perlbrew, and importantly cpanm on your login bash
-RUN su ddg -c 'echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.bashrc'
+RUN 'echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.bashrc'
 
 # This instance has problems with the tests for this package, so I install
 # it without running the tests (-s)
-RUN su ddg -c '/home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/cpan -f -s Text::Xslate'
+RUN /home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/cpan -f -s Text::Xslate
 
 # Actually install duckpan
-RUN su ddg -c '/home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/cpanm App::DuckPAN'
+RUN /home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/cpanm App::DuckPAN
 
