@@ -24,6 +24,8 @@ RUN useradd -m ddg
 # declaration.
 USER ddg
 
+ENV HOME /home/ddg
+
 # Install perlbrew, a tool that creates perl working environments in the users
 # home directories
 RUN curl -kL http://install.perlbrew.pl | /bin/bash
