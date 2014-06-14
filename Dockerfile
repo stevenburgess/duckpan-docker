@@ -3,7 +3,10 @@
 # docker will not default to a new version when it comes out.
 FROM ubuntu:14.04
 
+FROM ubuntu:trusty
 MAINTAINER Steven Burgess steven.a.burgess@hotmail.com
+# With help from Chris Weyl <chris.weyl@wps.io>, who wrote a perlbrew installer
+# at https://github.com/RsrchBoy/perlbrew-base-dock
 
 RUN apt-get update
 RUN apt-get install -y build-essential
@@ -12,31 +15,30 @@ RUN apt-get install -y curl
 # During the install of the duckpan, we found out we also need
 RUN apt-get install -y libssl-dev
 
+# prep for the install...
+RUN umask 0022
+RUN mkdir -p /usr/local/perlbrew /root
+ENV HOME /root
+ENV PERLBREW_ROOT /usr/local/perlbrew
+ENV PERLBREW_HOME /root/.perlbrew
 
-# This will be the dividing line, all above steps do not specify a user
-# so they are done by root. Below are things done by the ddg user.
-
-
-# Create the user with a home directory
-RUN useradd -m ddg
-# Install perlbrew, a tool that creates perl working environments in the users
-# home directories
-RUN su ddg -c 'curl -kL http://install.perlbrew.pl | bash'
+# install the standalone perlbrew and cpanm
+RUN curl -kL http://install.perlbrew.pl | bash
+ENV PATH /usr/local/perlbrew/bin:$PATH
+ENV PERLBREW_PATH /usr/local/perlbrew/bin
 # This drops the perlbrew binary into ~/perl5/perlbrew/bin/perlbrew,
 # You can then run the perbew installer to get the correct version of perl.
 # Note that this does take a while!
-RUN su ddg -c '/home/ddg/perl5/perlbrew/bin/perlbrew install perl-5.16.3'
+RUN perlbrew install perl-5.16.3
+ENV PATH /usr/local/perlbrew/perls/perl-5.16.3/bin:$PATH
 # Install cpanm with our specific version of perl. This places the cpnam bin
 # at /perl5/perlbrew/perls/perl-5.16.3/bin/cpanm
-RUN su ddg -c 'curl -L http://cpanmin.us | /home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/perl - App::cpanminus'
-
-# This gets perlbrew, and importantly cpanm on your login bash
-RUN su ddg -c 'echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.bashrc'
+RUN curl -L http://cpanmin.us | perl - App::cpanminus
 
 # This instance has problems with the tests for this package, so I install
 # it without running the tests (-s)
-RUN su ddg -c '/home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/cpan -f -s Text::Xslate'
+RUN cpan -f -s Text::Xslate
 
 # Actually install duckpan
-RUN su ddg -c '/home/ddg/perl5/perlbrew/perls/perl-5.16.3/bin/cpanm App::DuckPAN'
+RUN cpanm App::DuckPAN
 
